@@ -60,7 +60,8 @@ export async function POST(request: Request) {
     // In production, hash the password:
     // const hashedPassword = await bcrypt.hash(password, 12);
 
-    // @ts-expect-error - Prisma client will be regenerated
+    
+   
     await db.user.update({
       where: { id: user.id },
       data: { password } // Use hashedPassword in production

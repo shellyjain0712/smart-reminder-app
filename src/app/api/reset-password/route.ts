@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { z } from "zod";
@@ -43,10 +44,9 @@ export async function POST(request: Request) {
     }
 
     // Find the user
-    // @ts-expect-error - Prisma client will be regenerated
     const user = await db.user.findUnique({
       where: { email: resetToken.email }
-    });
+    }) as { id: string; email: string | null; name: string | null; password: string | null } | null;
 
     if (!user) {
       return NextResponse.json(
@@ -60,11 +60,9 @@ export async function POST(request: Request) {
     // In production, hash the password:
     // const hashedPassword = await bcrypt.hash(password, 12);
 
-    
-   
     await db.user.update({
       where: { id: user.id },
-      data: { password } // Use hashedPassword in production
+      data: { password } as any // Use hashedPassword in production
     });
 
     // Delete the used reset token

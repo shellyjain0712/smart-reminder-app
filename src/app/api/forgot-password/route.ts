@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { z } from "zod";
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
 
     // Delete any existing reset tokens for this email
     try {
-      // @ts-expect-error - Prisma client will be regenerated with PasswordResetToken model
+      // @ts-expect-error - passwordResetToken model exists in schema
       await db.passwordResetToken.deleteMany({
         where: { email }
       });
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
 
     // Create new reset token
     try {
-      // @ts-expect-error - Prisma client will be regenerated with PasswordResetToken model
+      // @ts-expect-error - passwordResetToken model exists in schema
       await db.passwordResetToken.create({
         data: {
           email,

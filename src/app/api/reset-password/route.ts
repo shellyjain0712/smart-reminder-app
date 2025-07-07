@@ -17,8 +17,7 @@ export async function POST(request: Request) {
     const { token, password } = resetPasswordSchema.parse(body);
 
     // Find the reset token
-    // @ts-expect-error - Prisma client will be regenerated
-    const resetToken = await db.passwordResetToken.findUnique({
+    const resetToken = await (db as any).passwordResetToken.findUnique({
       where: { token }
     });
 
@@ -32,8 +31,7 @@ export async function POST(request: Request) {
     // Check if token has expired
     if (new Date() > resetToken.expires) {
       // Delete expired token
-      // @ts-expect-error - Prisma client will be regenerated
-      await db.passwordResetToken.delete({
+      await (db as any).passwordResetToken.delete({
         where: { id: resetToken.id }
       });
       
@@ -66,14 +64,12 @@ export async function POST(request: Request) {
     });
 
     // Delete the used reset token
-    // @ts-expect-error - Prisma client will be regenerated
-    await db.passwordResetToken.delete({
+    await (db as any).passwordResetToken.delete({
       where: { id: resetToken.id }
     });
 
     // Delete all other reset tokens for this email
-    // @ts-expect-error - Prisma client will be regenerated
-    await db.passwordResetToken.deleteMany({
+    await (db as any).passwordResetToken.deleteMany({
       where: { email: resetToken.email }
     });
 

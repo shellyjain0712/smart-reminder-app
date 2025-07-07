@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { z } from "zod";
@@ -49,8 +50,7 @@ export async function POST(request: Request) {
 
     // Delete any existing reset tokens for this email
     try {
-      // @ts-expect-error - passwordResetToken model exists in schema
-      await db.passwordResetToken.deleteMany({
+      await (db as any).passwordResetToken.deleteMany({
         where: { email }
       });
     } catch (error) {
@@ -60,8 +60,7 @@ export async function POST(request: Request) {
 
     // Create new reset token
     try {
-      // @ts-expect-error - passwordResetToken model exists in schema
-      await db.passwordResetToken.create({
+      await (db as any).passwordResetToken.create({
         data: {
           email,
           token: resetToken,

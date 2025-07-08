@@ -35,6 +35,13 @@ export const authConfig = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       name: "credentials",
@@ -87,7 +94,7 @@ export const authConfig = {
     })
   ],
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
   pages: {
     signIn: '/login',
@@ -95,13 +102,38 @@ export const authConfig = {
     error: '/login',
   },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async signIn({ user, account, profile }) {
+      console.log('SignIn callback:', { 
+        user: { id: user.id, email: user.email, name: user.name }, 
+        account: account ? { provider: account.provider, type: account.type } : null,
+        profile: profile ? { email: profile.email, name: profile.name } : null
+      });
+      return true;
+    },
+    jwt: ({ token, user, account }) => {
+      console.log('JWT callback:', { 
+        tokenId: token.id, 
+        userId: user?.id, 
+        accountProvider: account?.provider 
+      });
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session: ({ session, token }) => {
+      console.log('Session callback:', { 
+        sessionUser: session.user?.email, 
+        tokenId: token.id 
+      });
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+        },
+      };
+    },
     async redirect({ url, baseUrl }) {
       console.log('Redirect called with:', { url, baseUrl });
       

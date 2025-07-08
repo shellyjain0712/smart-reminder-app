@@ -87,7 +87,7 @@ export const authConfig = {
     })
   ],
   session: {
-    strategy: "jwt",
+    strategy: "database",
   },
   pages: {
     signIn: '/login',
@@ -95,17 +95,11 @@ export const authConfig = {
     error: '/login',
   },
   callbacks: {
-    jwt: ({ token, user }) => {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    session: ({ session, token }) => ({
+    session: ({ session, user }) => ({
       ...session,
       user: {
         ...session.user,
-        id: token.id as string,
+        id: user.id,
       },
     }),
     async redirect({ url, baseUrl }) {
